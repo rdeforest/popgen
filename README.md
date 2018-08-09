@@ -13,6 +13,5 @@ Changes since then:
 * Git clone and all that
 * npm install
 * npm start
-* coffee -b -m -c -o public/javascripts public/coffee
 * browse localhost:3000
 * _enjoy_

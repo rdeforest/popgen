@@ -1,90 +1,69 @@
-#!/usr/bin/env node
+#!/usr/bin/env coffee
 
-/**
- * Module dependencies.
- */
+# Module dependencies.
 
-var app = require('../app');
-var debug = require('debug')('ballad:server');
-var http = require('http');
+debug = require('debug')('ballad:server')
+http  = require('http')
 
-/**
- * Get port from environment and store in Express.
- */
+app   = require('../app')
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+# Normalize a port into a number, string, or false.
 
-/**
- * Create HTTP server.
- */
+normalizePort = (val) ->
+  `var port`
+  port = parseInt(val, 10)
 
-var server = http.createServer(app);
+  if isNaN(port)
+    # named pipe
+    return val
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+  if port >= 0
+    # port number
+    return port
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+  false
 
-/**
- * Normalize a port into a number, string, or false.
- */
+# Get port from environment and store in Express.
 
-function normalizePort(val) {
-  var port = parseInt(val, 10);
+port = normalizePort(process.env.PORT or '3000')
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+# Event listener for HTTP server "error" event.
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+onError = (error) ->
+  if error.syscall != 'listen'
+    throw error
 
-  return false;
-}
+  bind = if typeof port == 'string' then 'Pipe ' + port else 'Port ' + port
 
-/**
- * Event listener for HTTP server "error" event.
- */
+  # handle specific listen errors with friendly messages
+  switch error.code
+    when 'EACCES'
+      console.error bind + ' requires elevated privileges'
+      process.exit 1
+    when 'EADDRINUSE'
+      console.error bind + ' is already in use'
+      process.exit 1
+    else
+      throw error
 
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+  return
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+# Event listener for HTTP server "listening" event.
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-}
+onListening = ->
+  addr = server.address()
+  bind = if typeof addr == 'string' then 'pipe ' + addr else 'port ' + addr.port
+  debug 'Listening on ' + bind
+  return
 
-/**
- * Event listener for HTTP server "listening" event.
- */
+app.set 'port', port
 
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
-}
+# Create HTTP server.
+
+server = http.createServer(app)
+
+# Listen on provided port, on all network interfaces.
+
+server.listen port
+server.on 'error', onError
+server.on 'listening', onListening

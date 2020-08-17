@@ -174,7 +174,7 @@ makeControlDiv = (context) ->
       .attr('type', 'text')
       .on('change', ->
         checkBpmInput this
-        qtrNote = Math.floor Math.pow bpmdd.value / 60 / 1000, -1
+        qtrNote = Math.floor Math.pow this.value / 60 / 1000, -1
         minNote = eightNote = qtrNote / 2
         restart())
       .attr('value', 100)))
@@ -187,7 +187,7 @@ checkBpmInput = (ob) ->
   console.log 'bpm: ', ob
   invalidChars = /[^0-9]/g
   ob.value = ob.value.replace invalidChars, ''
-  ob.value = Math.min 40, Math.max 300, ob.value
+  ob.value = Math.max 40, Math.min 300, ob.value
 
 restart = -> beginFunc() if isRunning
 

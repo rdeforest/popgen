@@ -1,5 +1,6 @@
 # Remove when popular browsers catch up
-AudioContext ?= AudioContext or webkitAudioContext
+if undefined is typeogf AudioContext
+  AudioContext = webkitAudioContext
 
 console.clear()
 console.log 'And so it starts...'

@@ -1,5 +1,5 @@
 # Remove when popular browsers catch up
-AudioContext = AudioContext or webkitAudioContext
+AudioContext ?= AudioContext or webkitAudioContext
 
 console.clear()
 console.log 'And so it starts...'
@@ -22,17 +22,12 @@ keys = {}
 for name in keyNames
   keys[name] = keyPitch name
 
-chordProg = [
-    [0, 2, 4],
-    [4, 6, 8],
-    [5, 7, 9],
-    [3, 5, 7]
-  ]
+chordProg = [ [0, 2, 4]
+              [4, 6, 8]
+              [5, 7, 9]
+              [3, 5, 7] ]
 
 waveforms = 'sine square sawtooth triangle'.split ' '
-
-# Ugh, global variables
-
 
 selections =
   key: keys["A"]
@@ -118,24 +113,24 @@ melodyFun = ->
     chor2.frequency.value = notes[chordProg[chord][1]]
     chor3.frequency.value = notes[chordProg[chord][2]]
 
-  if (time % (Math.floor Math.random() * qtrNote / minNote) is 0)
+  if time % (Math.floor Math.random() * qtrNote / minNote) is 0
     note = Math.floor Math.random() * (notes.length - 1)
     melody.frequency.value = notes[note]
 
 beginButtonInfo =
-  value: 'start'
-  onclick: beginFunc
+  value:     'start'
+  onclick:   beginFunc
   className: 'button'
 
 endButtonInfo =
-  value: 'end'
-  onclick: endFunc
+  value:     'end'
+  onclick:   endFunc
   className: 'button_end'
 
 makeButton = (info) ->
   {value, onclick, className} = info
   b = $('<input>')
-    .on('click', onclick)
+    .on     'click', onclick
     .attr
       type: 'button'
       value: value
@@ -143,41 +138,42 @@ makeButton = (info) ->
 
 makeButtonDiv = ->
   $('<div>')
-    .addClass('buttonDiv')
-    .append(makeButton beginButtonInfo)
-    .append(makeButton endButtonInfo)
+    .addClass 'buttonDiv'
+    .append makeButton beginButtonInfo
+    .append makeButton endButtonInfo
 
 capitalize = (s) -> s[0].toUpperCase() + s.substr 1
 
 makeSelector = (name, selected, options) ->
   cname = capitalize name
   sel = $('<select>')
-      .append((new Option o[0], o[1]) for o in options)
-      .addClass('selector')
-      .attr('name', cname + "Selector")
-      .on('change', -> restart selections[name] = @value)
-      .prop('selectedIndex', selected)
-      .append 'foo'
+      .append   (new Option o[0], o[1]) for o in options
+      .addClass 'selector'
+      .attr     'name', cname + "Selector"
+      .on       'change', -> restart selections[name] = @value
+      .prop     'selectedIndex', selected
+      .append   'foo'
 
   [cname + ': ', sel]
 
 makeControlDiv = (context) ->
   $('<div>')
-    .addClass('ddDiv')
-    .append((makeSelector('key',      9, ([k, f]     for k, f of keys)))...)
-    .append((makeSelector('octave',   3, ([o, o]     for o in [0 .. 6])))...)
-    .append((makeSelector('range',    1, ([i, i * 8] for i in [1 .. 5])))...)
-    .append((makeSelector('waveform', 2, ([w, w]     for w in waveforms)))...)
-    .append('BPM: ', ($('<input>')
-      .attr('name', 'BPMInput')
-      .addClass('textInput')
-      .attr('type', 'text')
-      .on('change', ->
+    .addClass 'ddDiv'
+    .append (makeSelector('key',      9, ([k, f]     for k, f of keys)))...
+    .append (makeSelector('octave',   3, ([o, o]     for o in [0 .. 6])))...
+    .append (makeSelector('range',    1, ([i, i * 8] for i in [1 .. 5])))...
+    .append (makeSelector('waveform', 2, ([w, w]     for w in waveforms)))...
+    .append 'BPM: ', $('<input>'
+      .attr 'name', 'BPMInput'
+      .addClass 'textInput'
+      .attr 'type', 'text'
+      .on 'change', ->
         checkBpmInput this
         qtrNote = Math.floor Math.pow this.value / 60 / 1000, -1
         minNote = eightNote = qtrNote / 2
-        restart())
-      .attr('value', 100)))
+        restart()
+      .attr 'value', 100
+    )
 
 updateBase = -> base = selections.key * Math.pow(2, selections.octave)
 
